@@ -2,8 +2,8 @@
 
 This API serves as the backbones of our project and is used to allow communication between the NFC scanners and the front-end via API calls. It also serves as the database to store user calendars.
 
-> main.py is `@cybrsucks`'s project, have a look,
-> as it shows the iteraction between Google API.
+> `main.py` is `@cybrsucks`'s project, have a look,
+> as it shows the interaction between Google API.
 
 ## To run:
 
