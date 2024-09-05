@@ -34,13 +34,22 @@ def upload_ics():
             "error": "No selected file"
         }), 400
     
+    if (not file.filename.endswith('.ics')):
+        return jsonify({
+            "error": "Invalid file type"
+        }), 400
+    
     user_id = "placeholder"
     events = Calendar.from_ics(file.read().decode("utf-8"), user_id)
 
     for event in events:
+        savedEvent = Calendar.query.filter(Calendar.start == event.start and Calendar.end == event.end).first()
+        if savedEvent is not None:
+            event.id = savedEvent.id
+            db.session.delete(savedEvent)
+            db.session.commit()
         db.session.add(event)
     db.session.commit()
-    
     events_data = [event.to_dict() for event in events]
     return jsonify({
         "events": events_data
