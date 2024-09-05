@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.models import db
+from app.models.tables import Calendar
 
 api = Blueprint('api', __name__)
 
@@ -10,12 +11,13 @@ def health():
             "healthy":True
         }), 200
 
-### CALENDAR ENDPOINT #########################
-@api.route('/calendar', methods=['GET'])
-def get_calendar():
-    email = request.args.get('email')
-    calendar = db.Calendar()
-    return jsonify(calendar.get_all(email)), 200
+@api.route('/calendar/<user>', methods=['GET'])
+def get_calendar(user):
+    events = Calendar.query.filter_by(user_id=user).all()
+    events_data = [event.to_dict() for event in events]
+    return jsonify({
+        "events": events_data
+    }), 200
 
 ### UPLOAD ICS ENDPOINT #########################
 @api.route('/upload-ics', methods=['POST'])
@@ -32,7 +34,15 @@ def upload_ics():
             "error": "No selected file"
         }), 400
     
-    ics_content = file.read().decode('utf-8')
+    user_id = "placeholder"
+    events = Calendar.from_ics(file.read().decode("utf-8"), user_id)
+
+    for event in events:
+        db.session.add(event)
+    db.session.commit()
+    
+    events_data = [event.to_dict() for event in events]
     return jsonify({
-        "content": ics_content
+        "events": events_data
     }), 200
+        
