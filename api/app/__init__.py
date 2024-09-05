@@ -8,7 +8,7 @@ def create_app():
 
     # Load the models
     from app.models import db
-    from app.models.tables import Calendar, Participant
+    from app.models.tables import Calendar
     db.init_app(app)
 
     # Create the database tables
