@@ -20,8 +20,8 @@ def get_calendar(user):
     }), 200
 
 ### UPLOAD ICS ENDPOINT #########################
-@api.route('/upload-ics', methods=['POST'])
-def upload_ics():
+@api.route('/upload-ics/<user>', methods=['POST'])
+def upload_ics(user):
     if 'file' not in request.files:
         return jsonify({
             "error": "No file part"
@@ -38,9 +38,7 @@ def upload_ics():
         return jsonify({
             "error": "Invalid file type"
         }), 400
-    
-    user_id = "placeholder"
-    events = Calendar.from_ics(file.read().decode("utf-8"), user_id)
+    events = Calendar.from_ics(file.read().decode("utf-8"), user)
 
     for event in events:
         savedEvent = Calendar.query.filter(Calendar.start == event.start and Calendar.end == event.end).first()
