@@ -29,14 +29,14 @@ Install python and pip
 
 Install poetry
 
-- `pip3 install poetry`
+- `pip3 install poetry icalendar flask flask_sqlalchemy`
 
 - `poetry install --no-root`
 
-In the `app` directory, run:
+In the `api` directory, run:
 
 - `poetry run flask --app app run -p {number} --debug`
 
-This will run locally on: `localhost:{number}`
+This will run locally on: `localhost:{number:4 digit}`
 
-To test if the server is running try: `localhost{number}/health`
+To test if the server is running try: `localhost{number: digit}/health`
