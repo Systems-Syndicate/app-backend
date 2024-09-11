@@ -9,13 +9,13 @@ events = []
 def get_events():
     return jsonify(events), 200
 
-@app.route('/events', methods=['ADD'])
+@app.route('/events', methods=['POST'])
 def create_event():
     new_event = request.json
     events.append(new_event)
     return jsonify(new_event), 201
 
-@app.route('/events/<int:event_id>', methods=['UPDATE'])
+@app.route('/events/<int:event_id>', methods=['PUT'])
 def update_event(event_id):
     updated_event = request.json
     events[event_id] = updated_event
