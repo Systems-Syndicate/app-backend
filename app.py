@@ -5,72 +5,83 @@ import os
 
 app = Flask(__name__)
 
-# sample in-memory data
-events = []
-calendar = Calendar()
-
 filename = 'calendar.ics'
-organizer = 'megan.roxburgh' # TODO: link to current user logged in on app/NFC id number
+if os.path.exists(filename):
+    with open(filename, 'r') as f:
+        calendar = Calendar(f.read())
+else:
+    calendar = Calendar()
 
+# Helper function to save the calendar to the .ics file
+def save_calendar():
+    with open(filename, 'w') as f:
+        f.writelines(calendar)
+
+# Helper function to find an event by its UID
+def find_event_by_uid(uid):
+    for event in calendar.events:
+        if event.uid == uid:
+            return event
+    return None
+
+# Get all events
 @app.route('/events', methods=['GET'])
 def get_events():
-    return jsonify(events), 200
+    events = [{
+        'uid': event.uid,
+        'name': event.name,
+        'begin': event.begin.strftime('%Y-%m-%d %H:%M:%S'),
+        'end': event.end.strftime('%Y-%m-%d %H:%M:%S'),
+        'description': event.description
+    } for event in calendar.events]
+    
+    return jsonify(events)
 
+# Add a new event
 @app.route('/events', methods=['POST'])
-def create_event():
+def add_event():
     new_event = request.json
     ics_event = Event()
     ics_event.name = new_event['name']
-    ics_event.begin = new_event['start']
-    ics_event.end = new_event['end']
+    ics_event.begin = datetime.strptime(new_event['begin'], '%Y-%m-%d %H:%M:%S')
+    ics_event.end = datetime.strptime(new_event['end'], '%Y-%m-%d %H:%M:%S')
     ics_event.description = new_event.get('description', '')
-    ics_event.location = new_event.get('location', '')
-    ics_event.organizer = organizer
+
+    ics_event.uid = f'{ics_event.begin.strftime("%Y%m%d%H%M%S")}-{ics_event.name}'
 
     calendar.events.add(ics_event)
+    save_calendar()
+    
+    return jsonify({'message': 'Event added successfully', 'uid': ics_event.uid})
 
-    with open(filename, 'w') as f:
-        f.writelines(calendar)
-
-    return jsonify(new_event), 201
-
-@app.route('/events/<int:event_id>', methods=['PUT'])
-def update_event(event_id):
+# Update an existing event
+@app.route('/events/<uid>', methods=['PUT'])
+def update_event(uid):
+    ics_event = find_event_by_uid(uid)
+    if not ics_event:
+        return jsonify({'error': 'Event not found'}), 404
+    
     updated_event = request.json
-    events[event_id] = updated_event
+    ics_event.name = updated_event.get('name', ics_event.name)
+    ics_event.begin = datetime.strptime(updated_event['begin'], '%Y-%m-%d %H:%M:%S') if 'begin' in updated_event else ics_event.begin
+    ics_event.end = datetime.strptime(updated_event['end'], '%Y-%m-%d %H:%M:%S') if 'end' in updated_event else ics_event.end
+    ics_event.description = updated_event.get('description', ics_event.description)
+    
+    save_calendar()
+    
+    return jsonify({'message': 'Event updated successfully'})
 
-    calendar_event = list(calendar.events)[event_id]
-    calendar_event.name = updated_event['name']
-    calendar_event.begin = updated_event['start']
-    calendar_event.end = updated_event['end']
-    calendar_event.description = updated_event.get('description', '')
-    calendar_event.location = updated_event.get('location', '')
-    calendar_event.organizer = organizer
-    calendar_event.attendees = updated_event.get('attendees', [])
-
-    with open(filename, 'w') as f:
-        f.writelines(calendar)
-
-    return jsonify(updated_event), 200
-
-@app.route('/events/<int:event_id>', methods=['DELETE'])
-def delete_event(event_id):
-    events.pop(event_id)
-
-    event_to_remove = list(calendar.events)[event_id]
-    calendar.events.remove(event_to_remove)
-
-    with open(filename, 'w') as f:
-        f.writelines(calendar)
-
-    return jsonify({'message': 'Event deleted'}), 204
-
-@app.route('/events/download', methods=['GET'])
-def download_calendar():
-    if os.path.exists(filename):
-        return send_file(filename, as_attachment=True)
-    else:
-        return jsonify({'error': 'Calendar not found'}), 404
+# Delete an event
+@app.route('/events/<uid>', methods=['DELETE'])
+def delete_event(uid):
+    event = find_event_by_uid(uid)
+    if not event:
+        return jsonify({'error': 'Event not found'}), 404
+    
+    calendar.events.remove(event)
+    save_calendar()
+    
+    return jsonify({'message': 'Event deleted successfully'})
 
 if __name__ == '__main__':
     app.run(debug=True)
