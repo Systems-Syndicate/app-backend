@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 # Installing dependencies for running a python application
 RUN apt-get update && apt-get install -y python3 python3-pip wget
 # Install pipenv
-RUN pip3 install poetry icalendar flask flask_sqlalchemy
+RUN pip3 install poetry icalendar flask flask_sqlalchemy ics 
 # Setting the working directory
 WORKDIR /app
 # Install pipenv dependencies
