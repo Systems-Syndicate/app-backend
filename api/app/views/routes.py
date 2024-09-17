@@ -105,3 +105,50 @@ def upload_calendar(nfc):
     file = request.files['file']
     file.save(f'data/{nfc}.ics')
     return jsonify({'message': 'Calendar uploaded successfully'}), 201
+
+### USER ENDPOINTS ##########################
+
+@api.route('/users/<nfc>', methods=['GET'])
+def get_user(nfc):
+    user = User.query.filter_by(nfcID=nfc).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    return jsonify({
+        'userID': user.userID,
+        'nfcID': user.nfcID,
+        'name': user.name
+    }), 200
+
+@api.route('/users', methods=['POST'])
+def add_user():
+    new_user = request.json
+    user = User(userID=str(uuid()), nfcID=new_user['nfcID'], name=new_user['name'])
+    db.session.add(user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User added successfully', 'userID': user.userID}), 201
+
+@api.route('/users/<nfc>', methods=['PUT'])
+def update_user(nfc):
+    user = User.query.filter_by(nfcID=nfc).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    updated_user = request.json
+    user.name = updated_user.get('name', user.name)
+    db.session.commit()
+    
+    return jsonify({'message': 'User updated successfully'}), 200
+
+@api.route('/users/<nfc>', methods=['DELETE'])
+def delete_user(nfc):
+    user = User.query.filter_by(nfcID=nfc).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User deleted successfully'}), 200
+
