@@ -3,7 +3,9 @@ from ics import Calendar as cal, Event
 import os
 from datetime import datetime
 from app.models import db
-from app.models.tables import Calendar
+from app.models.tables import Calendar, Active, User
+from uuid import uuid4 as uuid
+
 
 api = Blueprint('api', __name__)
 
@@ -152,3 +154,32 @@ def delete_user(nfc):
     
     return jsonify({'message': 'User deleted successfully'}), 200
 
+@api.route('/active', methods=['GET'])
+def get_active():
+    for active in Active.query.all():
+        if active.isOn:
+            return jsonify({'isOn': True}), 200
+        
+    return jsonify({'isOn': False}), 200
+
+@api.route('/active/<nfc>', methods=['POST'])
+def set_active(nfc):
+    # Search for user first
+    user = User.query.filter_by(nfcID=nfc).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Check if user isOn = True, set to False, otherwise set to True
+    active = Active.query.filter_by(userID=user.userID).first()
+    if active:
+        active.isOn = not active.isOn
+        active.updated = datetime.now()
+        db.session.commit()
+    else:
+        active = Active(userID=user.userID, nfcID=user.nfcID, updated=datetime.now(), isOn=True)
+        db.session.add(active)
+    db.session.commit()
+    for active in Active.query.all():
+        if active.isOn:
+            return jsonify({'message': 'Active status updated successfully', 'isOn': True}), 200
+    return jsonify({'message': 'Active status updated successfully', 'isOn': False}), 200
