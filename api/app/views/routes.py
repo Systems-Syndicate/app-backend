@@ -162,7 +162,7 @@ def get_active():
         
     return jsonify({'isOn': False}), 200
 
-@api.route('/active/<nfc>', methods=['POST'])
+@api.route('/active/<nfc>', methods=['GET'])
 def set_active(nfc):
     # Search for user first
     user = User.query.filter_by(nfcID=nfc).first()
