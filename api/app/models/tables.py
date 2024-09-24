@@ -1,7 +1,6 @@
 from . import db
-from icalendar import Calendar as iCalendar, Event
 import datetime
-from uuid import uuid4 as uuid
+
 
 class Calendar(db.Model):
     __tablename__ = 'calendar'
@@ -13,3 +12,10 @@ class User(db.Model):
     userID = db.Column(db.String(255), primary_key=True)
     nfcID = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
+
+class Active(db.Model):
+    __tablename__ = 'active'
+    userID = db.Column(db.String(255), primary_key=True)
+    nfcID = db.Column(db.String(255), nullable=False)
+    updated = db.Column(db.DateTime(), nullable=False)
+    isOn = db.Column(db.Boolean(), nullable=False)
