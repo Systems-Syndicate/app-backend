@@ -6,7 +6,6 @@ from app.models import db
 from app.models.tables import Calendar, Active, User
 from uuid import uuid4 as uuid
 
-
 api = Blueprint('api', __name__)
 
 ### HEALTH ENDPOINT #########################
@@ -52,7 +51,8 @@ def get_events(nfc):
         'name': event.name,
         'begin': event.begin.strftime('%Y-%m-%d %H:%M:%S'),
         'end': event.end.strftime('%Y-%m-%d %H:%M:%S'),
-        'description': event.description
+        'description': event.description,
+        'location': event.location
     } for event in calendar.events]
     
     return jsonify(events), 200
@@ -66,6 +66,7 @@ def add_event(nfc):
     ics_event.begin = datetime.strptime(new_event['begin'], '%Y-%m-%d %H:%M:%S')
     ics_event.end = datetime.strptime(new_event['end'], '%Y-%m-%d %H:%M:%S')
     ics_event.description = new_event.get('description', '')
+    ics_event.location = new_event.get('location', '')
 
     ics_event.uid = f'{ics_event.begin.strftime("%Y%m%d%H%M%S")}-{ics_event.name}'
 
@@ -86,6 +87,7 @@ def update_event(nfc, uid):
     ics_event.begin = datetime.strptime(updated_event['begin'], '%Y-%m-%d %H:%M:%S') if 'begin' in updated_event else ics_event.begin
     ics_event.end = datetime.strptime(updated_event['end'], '%Y-%m-%d %H:%M:%S') if 'end' in updated_event else ics_event.end
     ics_event.description = updated_event.get('description', ics_event.description)
+    ics_event.location = updated_event.get('location', ics_event.location)
     save_calendar(calendar, f'data/{nfc}.ics')
     
     return jsonify({'message': 'Event updated successfully'}), 200
@@ -93,7 +95,7 @@ def update_event(nfc, uid):
 @api.route('/events/<nfc>/<uid>', methods=['DELETE'])
 def delete_event(nfc, uid):
     calendar = get_calendar(nfc)
-    event = find_event_by_uid(uid)
+    event = find_event_by_uid(calendar, uid)
     if not event:
         return jsonify({'error': 'Event not found'}), 404
     

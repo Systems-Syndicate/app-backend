@@ -5,10 +5,11 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 Flask-SQLAlchemy = "^3.1.1"
 Flask = "^3.0.3"
 icalendar = "^5.0.13"
+flask-cors = "^5.0.0"
 
 [tool.poetry.dev-dependencies]
 
