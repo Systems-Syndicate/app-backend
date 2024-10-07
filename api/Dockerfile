@@ -3,11 +3,13 @@ FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y python3 python3-pip wget
 # Install pipenv
 RUN pip3 install poetry icalendar flask flask_sqlalchemy ics flask-cors
+
 # Setting the working directory
 WORKDIR /app
 # Install pipenv dependencies
 COPY pyproject.toml ./
 RUN poetry install --no-root
+RUN poetry add flask-cors icalendar ics flask_sqlalchemy
 # Copying our application into the container
 COPY app app
 
