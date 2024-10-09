@@ -12,6 +12,7 @@ class User(db.Model):
     userID = db.Column(db.String(255), primary_key=True)
     nfcID = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    colour = db.Column(db.String(255), nullable=False)
 
 class Active(db.Model):
     __tablename__ = 'active'

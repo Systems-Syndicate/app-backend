@@ -42,20 +42,20 @@ def get_calendar(nfc):
         calendar = cal()
     return calendar
 
-# Get all events
-@api.route('/events/<nfc>', methods=['GET'])
-def get_events(nfc):
-    calendar = get_calendar(nfc)
-    events = [{
-        'uid': event.uid,
-        'name': event.name,
-        'begin': event.begin.strftime('%Y-%m-%d %H:%M:%S'),
-        'end': event.end.strftime('%Y-%m-%d %H:%M:%S'),
-        'description': event.description,
-        'location': event.location
-    } for event in calendar.events]
+# # Get all events
+# @api.route('/events/<nfc>', methods=['GET'])
+# def get_events(nfc):
+#     calendar = get_calendar(nfc)
+#     events = [{
+#         'uid': event.uid,
+#         'name': event.name,
+#         'begin': event.begin.strftime('%Y-%m-%d %H:%M:%S'),
+#         'end': event.end.strftime('%Y-%m-%d %H:%M:%S'),
+#         'description': event.description,
+#         'location': event.location
+#     } for event in calendar.events]
     
-    return jsonify(events), 200
+#     return jsonify(events), 200
 
 @api.route('/events/<nfc>', methods=['POST'])
 def add_event(nfc):
@@ -121,13 +121,14 @@ def get_user(nfc):
     return jsonify({
         'userID': user.userID,
         'nfcID': user.nfcID,
-        'name': user.name
+        'name': user.name,
+        'colour': user.colour
     }), 200
 
 @api.route('/users', methods=['POST'])
 def add_user():
     new_user = request.json
-    user = User(userID=str(uuid()), nfcID=new_user['nfcID'], name=new_user['name'])
+    user = User(userID=str(uuid()), nfcID=new_user['nfcID'], name=new_user['name'], colour=new_user['colour'])
     db.session.add(user)
     db.session.commit()
     
@@ -185,3 +186,27 @@ def set_active(nfc):
         if active.isOn:
             return jsonify({'message': 'Active status updated successfully', 'isOn': True}), 200
     return jsonify({'message': 'Active status updated successfully', 'isOn': False}), 200
+
+@api.route('/events/<nfc>', methods=['GET'])
+def convert_ics_to_events(nfc):
+    user = User.query.filter_by(nfcID=nfc).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    calendar = get_calendar(nfc)
+
+    events = []
+    # Loop through the events in the calendar
+    for event in calendar.events:
+        events.append({
+            'user': user.name,   # Assuming 'user' is defined somewhere in the scope
+            'color': user.colour, # Assuming 'user' is defined somewhere in the scope
+            'id': event.uid if event.uid else nfc,  # Use NFC as fallback for ID
+            'title': event.name if event.name else "No Title",
+            'start': event.begin.strftime('%Y-%m-%d %H:%M:%S'),
+            'end': event.end.strftime('%Y-%m-%d %H:%M:%S'),
+            'summary': event.description if event.description else "No Summary",
+            'location': event.location if event.location else "No Location",
+        })
+
+    return jsonify(events), 200
