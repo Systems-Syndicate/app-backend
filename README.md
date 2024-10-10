@@ -14,6 +14,12 @@ If you have docker, In `api` (the directory that has the Dockerfile 😊), just 
 - `docker build -t test .`
 - `docker run -d -p 80:3801 test`
 
+or run the shell script:
+
+`./run.sh`
+
+> This is the only way for the API server to run on your local WiFi idk why...
+
 This will run locally on: `localhost`, to test if the server is running try: `localhost/health`.
 
 ### Manual
