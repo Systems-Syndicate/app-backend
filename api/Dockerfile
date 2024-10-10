@@ -13,10 +13,13 @@ WORKDIR /app
 # Install dependencies using poetry
 COPY pyproject.toml ./ 
 RUN poetry install --no-root
-RUN poetry add flask-cors icalendar ics flask_sqlalchemy
+RUN poetry add flask-cors icalendar ics flask_sqlalchemy flask
+
 
 # Copy application files
 COPY app app
+RUN mkdir -p /app/data
+
 
 # Running the application
 CMD ["poetry", "run", "flask", "--app", "app", "run", "--host=0.0.0.0", "--port", "3801", "--debug"]
