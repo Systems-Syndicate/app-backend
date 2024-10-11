@@ -58,6 +58,8 @@ def get_events(nfc):
     
     return jsonify(events), 200
 
+
+
 @api.route('/events/<nfc>', methods=['POST'])
 def add_event(nfc):
     calendar = get_calendar(nfc)
