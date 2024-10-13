@@ -47,4 +47,14 @@ In the `api` directory, run:
 
 This will run locally on: `localhost:{number:4 digit}`
 
+For example:
+
+- `poetry run flask --app app run -p 3801 --host=0.0.0.0` will run on <http://localhost:3801>
+
 To test if the server is running try: `localhost{number: digit}/health`
+
+### For debug purposes
+
+To restart server automatically after making changes while server is live, insert `--debug` flag
+
+- ```poetry run flask --app app run -p 3801 --host=0.0.0.0 --debug```
