@@ -53,6 +53,8 @@ On the tablet device, scan the QR code generated in the terminal to open the app
 
 The system is now ready to be run.
 
+If you have issues running the front-end, run `npm install`.
+
 ## Code Structure
 ### Back-End
 The back-end code consists of the API and the endpoints to write to the iCalendar files, which is backed up on an SQLAlchemy database. The code is organised into two sub-directories, `models` (containing the setup code for the database) and `views` (containing the endpoints to write to the iCalendar files).
@@ -66,11 +68,13 @@ Links to these files can be found here:
 The front-end chessboard contains multilple different interfaces, one for the actual chessboard display and one for the calendar display. The chessboard is best viewed when run on a tablet or an Android Galaxy Fold and then can be connected to an external monitor via a HDMI cable.
 
 Links to the important files can be found here:
-- [components/chessboard.tsx](frontend\chessboard\components\Chessboard.tsx): 
-- [co]
+- [components/chessboard.tsx](frontend\chessboard\components\Chessboard.tsx): displays the basic chessboard grid on the device
+- [components/lock.tsx](frontend\chessboard\components\lock.tsx): creates the personalised locking code
+- [components/calendar.tsx](frontend\chessboard\components\calendar.tsx): displays the calendar as a monthly, weekly or daily view with the users corresponding to the placed NFC tags
+- [components/ApiContext.tsx](frontend\chessboard\components\ApiContext.tsx): refreshes the calendar data from the database every second
 
 ### Front-End Phone
-
+Finally, the front-end mobile application
 
 
 
