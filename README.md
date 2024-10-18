@@ -74,59 +74,8 @@ Links to the important files can be found here:
 - [components/ApiContext.tsx](frontend\chessboard\components\ApiContext.tsx): refreshes the calendar data from the database every second
 
 ### Front-End Phone
-Finally, the front-end mobile application
+Finally, the front-end mobile application also consists of a main screen, which shows a schedule of the current user's events and has a button to add new events. Users can click on an existing event and edit the details, or delete it entirely.
 
-
-
-
-
-# Welcome to the KnightAPI
-
-This API serves as the backbones of our project and is used to allow communication between the NFC scanners and the front-end via API calls. It also serves as the database to store user calendars.
-
-> `main.py` is `@cybrsucks`'s project, have a look,
-> it shows the interaction between Google API.
-
-## To run:
-
-### Docker
-
-If you have docker, In `api` (the directory that has the Dockerfile 😊), just do:
-
-- `docker build -t test .`
-- `docker run -d -p 80:3801 test`
-
-or run the shell script:
-
-`./run.sh`
-
-> This is the only way for the API server to run on your local WiFi idk why...
-
-This will run locally on: `localhost`, to test if the server is running try: `localhost/health`.
-
-### Manual
-
-Install python and pip
-
-(Ubuntu/WSL)
-
-- `sudo apt-get update && apt-get install -y python3 python3-pip wget`
-
-(MacOS)
-
-- `brew update && brew install python3 wget`
-- `python3 -m pip install --upgrade pip`
-
-Install poetry
-
-- `pip3 install poetry icalendar flask flask_sqlalchemy ics flask-cors`
-
-- `poetry install --no-root`
-
-In the `api` directory, run:
-
-- `poetry run flask --app app run -p {number} --debug`
-
-This will run locally on: `localhost:{number:4 digit}`
-
-To test if the server is running try: `localhost{number: digit}/health`
+Links to the important files can be found here:
+- [hamburger/create_event.tsx](frontend\phone\hamburger\create_event.tsx): fetches the current user's events from the database, and includes an 'Add Event' button
+- [hamburger/create_event_android.js](frontend\phone\hamburger\create_event_android.gs): same as above, but works for Android devices 
